@@ -17,7 +17,7 @@ def hashBand(xArr, coeffArr):
     return hashSum % NUM_VIDEOS
 
 def jaccardSimilarity(candidate1, candidate2):
-    return 1.0
+    return np.intersect1d(candidate1[1], candidate2[1]).size / float(np.union1d(candidate1[1], candidate2[1]).size)
 
 def mapper(key, value):
     # key: None
