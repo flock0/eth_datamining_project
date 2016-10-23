@@ -40,10 +40,14 @@ def mapper(key, value):
             hashCoeffPair = shingleHashCoefficients[h]
             signatureVector[h] = min(signatureVector[h], hashShingle(shingle, hashCoeffPair[0], hashCoeffPair[1]))
 
-    bandHashes = np.empty(B, dtype=int)
+     # Output candidate pairs in the following form:
+     # key = (band, hash bucket of the hashed band)
+     # value = (videoId, shingles)
+     # For each band we output one pair.
+     # The str() call is necessary as the key may not be a tuple, hence we convert it to a string.
     for i in range(0, B):
-        yield (i, hashBand(signatureVector[i*R:i*(R+1)], bandHashCoefficients[i*R:i*(R+1), :])), (videoId, shingles)
-
+        yield str((i, hashBand(signatureVector[i*R:(i+1)*R], bandHashCoefficients))), (videoId, shingles)
+    
 def reducer(key, values):
     # key: key from mapper used to aggregate
     # values: list of all value for that key
