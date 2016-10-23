@@ -1,11 +1,12 @@
 import sys
+import ast
 import numpy as np
 HASH_PRIME = 7817 # Choose some random prime number larger than the number of videos
 RNG_SEED = 618984 # Random seed to be used by the RNG (so that each mapper derives the same hash functions)
 NUM_VIDEOS = 700
-
-R = 45
-B = 21
+SIMILARITY_THRESHOLD = 0.85
+R = 1
+B = 1
 def hashShingle(x, a, b):
     return ((a * x + b) % HASH_PRIME) % NUM_VIDEOS
 
@@ -14,6 +15,9 @@ def hashBand(xArr, coeffArr):
     for i in range(0, R):
         hashSum += ((coeffArr[i, 0] * xArr[i] + coeffArr[i, 1]) % HASH_PRIME) % NUM_VIDEOS
     return hashSum % NUM_VIDEOS
+
+def jaccardSimilarity(candidate1, candidate2):
+    return 1.0
 
 def mapper(key, value):
     # key: None
@@ -51,5 +55,13 @@ def mapper(key, value):
 def reducer(key, values):
     # key: key from mapper used to aggregate
     # values: list of all value for that key
-    yield 1, 1
+
+    for c in range(0, len(values)):
+        candidate1 = values[c]
+        for candidate2 in values[c+1:]:
+            if jaccardSimilarity(candidate1, candidate2) >= SIMILARITY_THRESHOLD:
+                if candidate1[0] < candidate2[0]:
+                    yield candidate1[0], candidate2[0]
+                else:
+                    yield candidate2[0], candidate1[0]
 
