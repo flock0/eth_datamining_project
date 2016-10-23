@@ -6,8 +6,15 @@ NUM_VIDEOS = 700
 
 R = 45
 B = 21
-def hash(x, a, b):
+def hashShingle(x, a, b):
     return ((a * x + b) % HASH_PRIME) % NUM_VIDEOS
+
+def hashBand(xArr, coeffArr):
+    hashSum = 0
+    for i in range(0, R):
+        hashSum += ((coeffArr[i, 0] * xArr[i] + coeffArr[i, 1]) % HASH_PRIME) % NUM_VIDEOS
+    return hashSum % NUM_VIDEOS
+
 def mapper(key, value):
     # key: None
     # value: one line of input file
@@ -20,17 +27,18 @@ def mapper(key, value):
     shingles = np.fromstring(value[VIDEO_ID_STRING_LENGTH + 1:], dtype=int, sep=' ')
     shingles.sort()
 
-    # Decide on R * B hash functions
+    # Decide on R * B functions for hashing the shingles
     np.random.seed(RNG_SEED)
-    hashCoefficients = np.random.randint(low=1, high=HASH_PRIME, size=(R*B, 2)) # Create random hash functions by drawing values for a and b
-
+    shingleHashCoefficients = np.random.randint(low=1, high=HASH_PRIME, size=(R*B, 2)) # Create random hash functions by drawing values for a and b
+    # Decide on R functions for hashing a band
+    bandHashCoefficients = np.random.randint(low=1, high=HASH_PRIME, size(R, 2))
 
     # Create signature vector using min-hash
     signatureVector = np.full(R*B, sys.maxint)
     for shingle in shingles:
         for h in range(0, R*B):
-            hashCoeffPair = hashCoefficients[h]
-            signatureVector[h] = min(signatureVector[h], hash(shingle, hashCoeffPair[0], hashCoeffPair[1]))
+            hashCoeffPair = shingleHashCoefficients[h]
+            signatureVector[h] = min(signatureVector[h], hashShingle(shingle, hashCoeffPair[0], hashCoeffPair[1]))
 
     yield 1, 1
 
