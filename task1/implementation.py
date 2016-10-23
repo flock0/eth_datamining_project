@@ -31,7 +31,7 @@ def mapper(key, value):
     np.random.seed(RNG_SEED)
     shingleHashCoefficients = np.random.randint(low=1, high=HASH_PRIME, size=(R*B, 2)) # Create random hash functions by drawing values for a and b
     # Decide on R functions for hashing a band
-    bandHashCoefficients = np.random.randint(low=1, high=HASH_PRIME, size(R, 2))
+    bandHashCoefficients = np.random.randint(low=1, high=HASH_PRIME, size=(R, 2))
 
     # Create signature vector using min-hash
     signatureVector = np.full(R*B, sys.maxint)
@@ -40,7 +40,9 @@ def mapper(key, value):
             hashCoeffPair = shingleHashCoefficients[h]
             signatureVector[h] = min(signatureVector[h], hashShingle(shingle, hashCoeffPair[0], hashCoeffPair[1]))
 
-    yield 1, 1
+    bandHashes = np.empty(B, dtype=int)
+    for i in range(0, B):
+        yield (i, hashBand(signatureVector[i*R:i*(R+1)], bandHashCoefficients[i*R:i*(R+1), :])), (videoId, shingles)
 
 def reducer(key, values):
     # key: key from mapper used to aggregate
