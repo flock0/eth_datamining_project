@@ -5,8 +5,8 @@ HASH_PRIME = 7817 # Choose some random prime number larger than the number of vi
 RNG_SEED = 618984 # Random seed to be used by the RNG (so that each mapper derives the same hash functions)
 NUM_VIDEOS = 700
 SIMILARITY_THRESHOLD = 0.85
-R = 1
-B = 1
+R = 13
+B = 55
 def hashShingle(x, a, b):
     return ((a * x + b) % HASH_PRIME) % NUM_VIDEOS
 
