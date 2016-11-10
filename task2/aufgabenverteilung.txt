@@ -1,0 +1,12 @@
+Aufgabenverteilung 10.11.2016:
+
+- Einfachen GD implementieren >> NINOW
+    - mit klarem Interface
+- Parallel SGD aufsetzen >> FCHLAN
+    - Um die Implementierungen von GD-Algorithmen einfach verwenden (und austauschen) zu können
+- Feature Transformations >> YUDA
+    - Daten analysieren und überlegen, welche Transformationen Sinn machen
+- ADAM
+- Cross-Validation / GridSearch >> FCHLAN
+    - Mittels externer Libraries
+    - Um die Parameter der GD-Algorithmen zu optimieren
