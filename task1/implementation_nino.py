@@ -4,15 +4,17 @@ import itertools
 shingle_range = [0, 8192]
 
 #parameters for hashing
-prime = 56267
-N = 8192
-H = 1000
-B = 1
-b = H/B
-hash_family = np.random.randint(1,10000,(H,2))
+prime = 94261
+N = 700
+R = 10
+B = 40
+H = R*B
 
-bucket_hash = np.random.randint(1,10000,(B,2))
 
+hash_family = np.random.randint(1,prime,(H,2))
+bucket_hash_family = np.random.randint(1,prime,(R,2))
+
+#hash function that hashes column col with hash coefficients a and b
 def hash(col, a, b):
     return ((a*float(col) + b) % prime) % N
 
@@ -28,23 +30,21 @@ def mapper(key, value):
     M = np.full((H,1), float('inf'))
 
     for entry in values:
-        for i in range(0,H-1):
+        for i in range(0,H):
             h = hash_family[i]
             temp_hash = hash(entry, h[0], h[1])
             if M[i] > temp_hash:
                 M[i] = temp_hash
 
-    buckets = np.full((B,1), float('inf'))
     for i in range(0, B):
-        for j in range(0,b):
-            input_a = bucket_hash[i,0]
-            input_b = bucket_hash[i,1]
-            temp_hash = hash(M[i*b+j], input_a, input_b)
-            if buckets[i] > temp_hash:
-                buckets[i] = temp_hash
+    	bucket_signature = []
+        for j in range(0,R):
+            input_a = bucket_hash_family[j,0]
+            input_b = bucket_hash_family[j,1]
+            bucket_signature.append(hash(M[i*R+j], input_a, input_b))
+        bucket_hash = np.sum(bucket_signature) % N
+        yield str((i, bucket_hash)), value
 
-    sum = (np.sum(buckets) % N)
-    yield (sum, value)
 
 def jaccard_sim(tuple):
     intersection = tuple[0].intersection(tuple[1])
