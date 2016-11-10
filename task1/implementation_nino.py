@@ -6,8 +6,8 @@ shingle_range = [0, 8192]
 #parameters for hashing
 prime = 94261
 N = 700
-R = 10
-B = 40
+R = 20
+B = 50
 H = R*B
 
 
