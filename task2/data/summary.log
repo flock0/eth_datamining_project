@@ -1,0 +1,168 @@
+
+Running with 20
+=================
+TP: 7936
+TN: 7996
+FP: 2025
+FN: 2043
+accuracy: 0.7966
+
+Running with 22
+=================
+TP: 7958
+TN: 8006
+FP: 2015
+FN: 2021
+accuracy: 0.7982
+
+Running with 24
+=================
+TP: 7985
+TN: 7999
+FP: 2022
+FN: 1994
+accuracy: 0.7992
+
+Running with 26
+=================
+TP: 7983
+TN: 8017
+FP: 2004
+FN: 1996
+accuracy: 0.8
+
+Running with 28
+=================
+TP: 8047
+TN: 8041
+FP: 1980
+FN: 1932
+accuracy: 0.8044
+
+Running with 30
+=================
+TP: 8043
+TN: 8069
+FP: 1952
+FN: 1936
+accuracy: 0.8056
+
+Running with 32
+=================
+TP: 8071
+TN: 8093
+FP: 1928
+FN: 1908
+accuracy: 0.8082
+
+Running with 34
+=================
+TP: 8065
+TN: 8085
+FP: 1936
+FN: 1914
+accuracy: 0.8075
+
+Running with 36
+=================
+TP: 8049
+TN: 8112
+FP: 1909
+FN: 1930
+accuracy: 0.80805
+
+Running with 38
+=================
+TP: 8087
+TN: 8119
+FP: 1902
+FN: 1892
+accuracy: 0.8103
+
+Running with 40
+=================
+TP: 8068
+TN: 8090
+FP: 1931
+FN: 1911
+accuracy: 0.8079
+
+Running with 42
+=================
+TP: 8092
+TN: 8107
+FP: 1914
+FN: 1887
+accuracy: 0.80995
+
+Running with 44
+=================
+TP: 8057
+TN: 8070
+FP: 1951
+FN: 1922
+accuracy: 0.80635
+
+Running with 46
+=================
+TP: 8077
+TN: 8103
+FP: 1918
+FN: 1902
+accuracy: 0.809
+
+Running with 48
+=================
+TP: 8052
+TN: 8099
+FP: 1922
+FN: 1927
+accuracy: 0.80755
+
+Running with 50
+=================
+TP: 8065
+TN: 8082
+FP: 1939
+FN: 1914
+accuracy: 0.80735
+
+Running with 52
+=================
+TP: 8054
+TN: 8091
+FP: 1930
+FN: 1925
+accuracy: 0.80725
+
+Running with 54
+=================
+TP: 8035
+TN: 8062
+FP: 1959
+FN: 1944
+accuracy: 0.80485
+
+Running with 56
+=================
+TP: 7995
+TN: 8055
+FP: 1966
+FN: 1984
+accuracy: 0.8025
+
+Running with 58
+=================
+TP: 8024
+TN: 8054
+FP: 1967
+FN: 1955
+accuracy: 0.8039
+
+Running with 60
+=================
+TP: 8005
+TN: 8064
+FP: 1957
+FN: 1974
+accuracy: 0.80345
