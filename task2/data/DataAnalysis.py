@@ -1,4 +1,5 @@
 import numpy as np
+numpy.set_printoptions(threshold=numpy.nan)
 import sys
 from sklearn import linear_model
 from sklearn.model_selection import cross_val_predict
@@ -26,26 +27,13 @@ poly = PolynomialFeatures(degree=2, interaction_only=True)
 n_components = int(sys.argv[1])
 selection = PCA(n_components=n_components)
 
-x_scale = scaler.fit_transform(x,y_raw)
 x_trans = selection.fit_transform(x_scale,y_raw)
 x_poly = poly.fit_transform(x_trans,y_raw)
 x_transform = x_poly
 
 # Do the regression with a linear regressor<html>
-<head>
-<title>Untitled</title>
-</head>
-Dear jane <br>
-<p>You are invited at the weekly meeting
-<p>Yours sincerely, <br>
-John
-</html>
-
-#regr = linear_model.LinearRegression()
-regr = SVC(kernel='linear')
+regr = linear_model.LinearRegression()
 predicted = cross_val_predict(regr, x_transform, y_raw, cv=10)
-
-
 # Evaluate the score
 
 FP = 0
