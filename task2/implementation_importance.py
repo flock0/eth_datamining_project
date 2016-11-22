@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import SelectKBest, chi2
 
 def transform(X):
     return X
@@ -24,7 +24,7 @@ def mapper(key, value):
 
     # Parse the input and shuffle it
     X,Y = parseValue(value)
-    selection = SelectKBest()
+    selection = SelectKBest(chi2)
     selection.fit(X,Y)
 
     yield "key",  selection.scores_ # This is how you yield a key, value pair
