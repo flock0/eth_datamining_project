@@ -11,7 +11,7 @@ def transform(X_input):
     
     # Hyperparameters
     m = 2000
-    gamma = 80 # 20 unten 40 oben, 80 optimum
+    gamma = 100 # oben 1000
 
     # Normalize the data
     #X = (X_input - mean) * (1/std)
@@ -74,10 +74,10 @@ def mapper(key, value):
     '''
 
     # Hyper parameters
-    lamda = 1e-4 # unten
-    T = 2000
+    lamda = 1e-5 # unten
+    T = 3000
     batchsize = 1024
-    alpha = 0.2
+    alpha = 0.5
 
     # Parse the input and shuffle it
     X,Y = parseValue(value)
