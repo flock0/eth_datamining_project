@@ -12,44 +12,16 @@ def transform(X_input):
     # Normalize the data
     X = (X_input - mean) * (1/std)
 
-    # Select the k best features
-    k = 100
-    if False:
-        X = X[:,importance_order[:k]]
+    # PCA
+    X = X * pca.T
 
     # Do the polynomial transformation
-    if False:
-        for i in range(k):
-            for j in range(i, k):
+    if True:
+        for i in range(38):
+            for j in range(i, 38):
                 new_feature = np.multiply(X[:,i],X[:,j]).reshape(X.shape[0],1)
                 X = np.append(X, new_feature, axis=1)
                 print(i,j)
-
-    # Do the transformation
-    if True:
-        max_index = X_input.shape[1]
-        for i in range(max_index):
-            new_feature = np.multiply(X[:,i],X[:,i]).reshape(X.shape[0],1)
-            X = np.append(X, new_feature, axis=1)
-            new_feature2 = np.multiply(np.multiply(X[:,i],X[:,i]),X[:,i]).reshape(X.shape[0],1)
-            X = np.append(X, new_feature2, axis=1)
-            new_feature4 = np.exp(-X[:,i]).reshape(X.shape[0],1)
-            X = np.append(X, new_feature4, axis=1)
-            new_feature5 = np.exp(X[:,i]).reshape(X.shape[0],1)
-            X = np.append(X, new_feature5, axis=1)
-            print(i)
-
-    if True:
-        new_feature = np.std(X_input, axis=1).reshape(X.shape[0],1)
-        np.append(X, new_feature, axis=1)
-        new_feature = np.var(X_input, axis=1).reshape(X.shape[0],1)
-        np.append(X, new_feature, axis=1)
-        new_feature = np.min(X_input, axis=1).reshape(X.shape[0],1)
-        np.append(X, new_feature, axis=1)
-        new_feature = np.max(X_input, axis=1).reshape(X.shape[0],1)
-        np.append(X, new_feature, axis=1)
-        new_feature = np.median(X_input, axis=1).reshape(X.shape[0],1)
-        np.append(X, new_feature, axis=1)
 
     print(X.shape)
     return X
@@ -93,10 +65,10 @@ def mapper(key, value):
     '''
 
     # Hyper parameters
-    lamda = 1e-3
-    T = 500
+    lamda = 1e-1
+    T = 1000
     batchsize = 1024
-    alpha = 0.5
+    alpha = 0.8
 
     # Parse the input and shuffle it
     X,Y = parseValue(value)
