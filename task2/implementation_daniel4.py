@@ -4,15 +4,20 @@ import math
 from time import sleep
 
 def transform(X_input):
-    # Make sure this function works for both 1D and 2D NumPy arrays.
-    
-    # Hyperparameters
+    """Calculate the random fourier features for an Gaussian kernel
+
+    Keyword arguments:
+    X_input - the input matrix X_input which will be transformed
+    """
+
+    # Parameters
     m = 3000
-    gamma = 60 # link oben 50 ,oben recht 40, unten links 30, unten rechts 20
-    # Best 0.8161 with gamma=60 lamda=0.8e-5
-    # Normalize the data
+    gamma = 60
+
+    # Copy
     X = X_input
 
+    # Get the dimensions
     d = 0
     if len(X.shape)<=1:
         d = len(X)
@@ -21,7 +26,6 @@ def transform(X_input):
 
     # Draw iid m samples omega from p and b from [0,2pi]
     random_state = RandomState(124)
-
     omega = np.sqrt(2.0 * gamma) * random_state.normal(size=(d, m))
     b = random_state.uniform(0, 2 * np.pi, size=m)
 
@@ -32,6 +36,11 @@ def transform(X_input):
     return Z
 
 def parseValue(value):
+    """ Parse the value from string to np matrix
+
+    Keyword arguments:
+    value - a string containing a matrix
+    """
     arrayList = []
     for item in value:
         array = np.fromstring(item, dtype=float, sep=' ')
@@ -43,7 +52,16 @@ def parseValue(value):
     return X_trans,Y
 
 def calculateGradient(X, Y, lamda, w, batchsize, dimension):
+    """ Calculate the gradient of a hinge loss
+
+    Keyword arguments:
+    value - a string containing a matrix
+    """
+
+    # random batch selection
     index = np.random.choice(X.shape[0], size = batchsize, replace=False)
+    
+    # Gradient calculation
     gradient = np.zeros(dimension)
     counter = 0
 
@@ -53,7 +71,6 @@ def calculateGradient(X, Y, lamda, w, batchsize, dimension):
         y = Y[i]
         # Check if it is classified correctly with w
         # If not, add the negative direction to the gradient
-        #print("check", y*w.dot(x))
         if y*w.dot(x) < 1:
             gradient = gradient - y*x
             counter = counter + 1
@@ -64,15 +81,16 @@ def calculateGradient(X, Y, lamda, w, batchsize, dimension):
 
 
 def mapper(key, value):
-    '''key: None
+    '''
+    The mapper which implements the PEGASOS method (complementary to our EVA method)
+    key: None
     value: one line of input file
-    Implements the PEGASOS method (complementary to our EVA method)
     '''
 
     # Hyper parameters
-    lamda = 1.4e-5
-    # oben links 1.2, rechts 1.3, unten links 1.4, rechts 1.0
-    T = 3000
+    lamda = 1.7e-5 # BEST: 1.7 with 0.8169
+    T = 2000
+
     batchsize = 1024 # unten links 1500
     alpha = 0.5
 
@@ -102,9 +120,9 @@ def mapper(key, value):
 
 def reducer(key, values):
     '''
+    Implements the EVA method (EVArage method, complementary to our ADAM)
     key: key from mapper used to aggregate
     values: list of all value for that key
-    Implements the EVA method (EVArage method, complementary to our ADAM)
     '''
     avg = np.average(values, axis=0)
     yield avg
