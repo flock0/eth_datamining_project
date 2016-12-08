@@ -115,20 +115,24 @@ def importance_sampling(X, B, coresetSize):
     sampling_probabilities = sampling_probabilities / (np.sum(sampling_probabilities) * 1.0)
     coreset_indices = np.random.choice(n,coresetSize,p=sampling_probabilities)
     coreset = np.array(X[coreset_indices])
-    weights = 1 / sampling_probabilities
+    weights = 1.0 / np.array(sampling_probabilities[coreset_indices])
     return coreset, weights
                 
 def mapper(key, value):
     # key: None
     # value: one line of input file
     B = d2sampling(value, d2SampleSize)
-    coreset, weights = importance_sampling(value, B, coresetSize) 
-    yield "key", (coreset, weights)
+    coreset, weights = importance_sampling(value, B, coresetSize)
+    yield "key", np.concatenate([weights.reshape((coresetSize, 1)), coreset], axis=1)
 
 
 def reducer(key, values):
     # key: key from mapper used to aggregate
     # values: list of all value for that key
     # Note that we do *not* output a (key, value) pair here.
-    print len(values)
+    splitArrays = np.split(values, [1],axis=1)
+    weights = splitArrays[0]
+    coreset = splitArrays[1]
+    #for coreset, weights in values:
+    #    print coreset.shape, len(weights)
     yield np.random.randn(200, 250)
