@@ -6,6 +6,7 @@ from math import log
 k = 200
 d2SampleSize = 5
 coresetSize = 200
+kMeansLoop = 5
 def nearest_B_index(x, B):
     '''
     Returns the index of the nearest point in B to point x
@@ -133,6 +134,10 @@ def reducer(key, values):
     splitArrays = np.split(values, [1],axis=1)
     weights = splitArrays[0]
     coreset = splitArrays[1]
-    #for coreset, weights in values:
-    #    print coreset.shape, len(weights)
-    yield np.random.randn(200, 250)
+    centroids = np.random.rand(k, 250) * 20
+    
+    for l in range(0, kMeansLoop):
+        for t in range(0, coreset.shape[0]):
+            c = nearest_B_index(coreset[t], centroids)
+            centroids[c] = centroids[c] + 1.0 / t * weights[t] * (coreset[t] - centroids[c])
+    yield centroids
