@@ -4,7 +4,8 @@ from math import log
 
 
 k = 200
-
+d2SampleSize = 5
+coresetSize = 200
 def nearest_B_index(x, B):
     '''
     Returns the index of the nearest point in B to point x
@@ -21,7 +22,7 @@ def nearest_B_index(x, B):
         if dist < min_distance:
             min_distance = dist
             nearest_B_index = i
-    return nerest_B_index
+    return nearest_B_index
 
 def squared_distance(x, B):
     '''
@@ -95,9 +96,9 @@ def importance_sampling(X, B, coresetSize):
     nearbiDataPointsLength = np.zeros(lenB, dtype=float)
     
     for i, x in enumerate(X):
-        nearest_B_index = nearest_B_index(x, B)
-        nearest_B_indices.append(nearest_B_index)
-        nearbiDataPointsDistanceSums[nearest_B_index] += distances[i]
+        iNearestB = nearest_B_index(x, B)
+        nearest_B_indices.append(iNearestB)
+        nearbiDataPointsDistanceSums[iNearestB] += distances[i]
         nearbiDataPointsLength += 1
         
         
@@ -112,14 +113,15 @@ def importance_sampling(X, B, coresetSize):
         sampling_probabilities.append(first_term + second_term + third_term)
         
     sampling_probabilities = sampling_probabilities / (np.sum(sampling_probabilities) * 1.0)
-    coreset = np.random.choice(X,coresetSize,p=sampling_probabilities)
+    coreset_indices = np.random.choice(n,coresetSize,p=sampling_probabilities)
+    coreset = np.array(X[coreset_indices])
     weights = 1 / sampling_probabilities
     return coreset, weights
                 
 def mapper(key, value):
     # key: None
     # value: one line of input file
-    B = d2sampling(value, 5)
+    B = d2sampling(value, d2SampleSize)
     coreset, weights = importance_sampling(value, B, coresetSize) 
     yield "key", (coreset, weights)
 
