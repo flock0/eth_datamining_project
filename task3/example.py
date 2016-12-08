@@ -103,6 +103,7 @@ def importance_sampling(X, B, coresetSize):
         nearbiDataPointsLength[iNearestB] += 1
         
         
+    print nearest_B_indices.min(), nearest_B_indices.max()
     sampling_probabilities = []
     for i, item in enumerate(X):
         first_term = alpha*distances[i]/c_mean
