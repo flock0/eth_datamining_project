@@ -100,7 +100,7 @@ def importance_sampling(X, B, coresetSize):
         iNearestB = nearest_B_index(x, B)
         nearest_B_indices.append(iNearestB)
         nearbiDataPointsDistanceSums[iNearestB] += distances[i]
-        nearbiDataPointsLength += 1
+        nearbiDataPointsLength[iNearestB] += 1
         
         
     sampling_probabilities = []
