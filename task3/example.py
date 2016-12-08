@@ -4,7 +4,7 @@ from math import log
 
 
 k = 200
-d2SampleSize = 5
+d2SampleSize = 10
 coresetSize = 200
 kMeansLoop = 5
 def nearest_B_index(x, B):
@@ -132,9 +132,11 @@ def reducer(key, values):
     # values: list of all value for that key
     # Note that we do *not* output a (key, value) pair here.
     splitArrays = np.split(values, [1],axis=1)
-    weights = splitArrays[0]
+    weights = splitArrays[0].ravel()
+    weights = weights / (np.sum(weights) * 1.0)
     coreset = splitArrays[1]
-    centroids = np.random.rand(k, 250) * 20
+
+    centroids = np.random.rand(k, 250) * 20 - 10
     
     for l in range(0, kMeansLoop):
         for t in range(0, coreset.shape[0]):
