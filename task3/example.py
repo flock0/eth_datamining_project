@@ -4,9 +4,9 @@ from math import log
 
 
 k = 200
-d2SampleSize = 10
-coresetSize = 200
-kMeansLoop = 5
+d2SampleSize = 5
+coresetSize = 100
+kMeansLoop = 1000
 def nearest_B_index(x, B):
     '''
     Returns the index of the nearest point in B to point x
@@ -102,7 +102,7 @@ def importance_sampling(X, B, coresetSize):
         nearbiDataPointsDistanceSums[iNearestB] += distances[i]
         nearbiDataPointsLength[iNearestB] += 1
         
-        
+    
     sampling_probabilities = []
     for i, item in enumerate(X):
         first_term = alpha*distances[i]/c_mean
@@ -113,6 +113,7 @@ def importance_sampling(X, B, coresetSize):
         
         sampling_probabilities.append(first_term + second_term + third_term)
         
+    
     sampling_probabilities = sampling_probabilities / (np.sum(sampling_probabilities) * 1.0)
     coreset_indices = np.random.choice(n,coresetSize,p=sampling_probabilities, replace=False)
     coreset = np.array(X[coreset_indices])
@@ -136,8 +137,9 @@ def reducer(key, values):
     weights = weights / (np.sum(weights) * 1.0)
     coreset = splitArrays[1]
 
-    centroids = np.random.rand(k, 250) * 20 - 10
-    
+
+    centroid_indices = np.random.choice(coreset.shape[0],k, replace=False)
+    centroids = np.array(coreset[centroid_indices])
     for l in range(0, kMeansLoop):
         for t in range(0, coreset.shape[0]):
             c = nearest_B_index(coreset[t], centroids)
