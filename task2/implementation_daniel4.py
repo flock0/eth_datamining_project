@@ -90,6 +90,7 @@ def mapper(key, value):
     # Hyper parameters
     lamda = 1.7e-5 # BEST: 1.7 with 0.8169
     T = 2000
+
     batchsize = 1024 # unten links 1500
     alpha = 0.5
 

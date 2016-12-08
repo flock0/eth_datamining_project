@@ -74,4 +74,3 @@ def reducer(key, values):
     # Note that we do *not* output a (key, value) pair here.
     print len(values)
     yield np.random.randn(200, 250)
-
