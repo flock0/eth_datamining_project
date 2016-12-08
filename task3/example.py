@@ -139,5 +139,5 @@ def reducer(key, values):
     for l in range(0, kMeansLoop):
         for t in range(0, coreset.shape[0]):
             c = nearest_B_index(coreset[t], centroids)
-            centroids[c] = centroids[c] + 1.0 / t * weights[t] * (coreset[t] - centroids[c])
+            centroids[c] = centroids[c] + 1.0 / (t+1) * weights[t] * (coreset[t] - centroids[c])
     yield centroids
