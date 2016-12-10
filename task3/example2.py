@@ -6,7 +6,7 @@ import time
 
 k = 200
 d2SampleSize = 20
-coresetSize = 2000
+coresetSize = 400
 kMeansLoop = 20
 def nearest_B_index(x, B):
     '''
@@ -86,7 +86,7 @@ def d2sampling(X, samplesize):
 def importance_sampling(X, B, coresetSize):
     n = X.shape[0]
     lenB = B.shape[0]
-    alpha = log(k) + 1
+    alpha = log(k, 2) + 1
         
     # Calculate all squared distances beforehand
     distances = []
@@ -123,6 +123,7 @@ def importance_sampling(X, B, coresetSize):
     return coreset, weights
 
 def mapper(key, value):
+    print ""
     print "Start mapper"
     print "============"
     # key: None
@@ -136,6 +137,7 @@ def mapper(key, value):
 
 
 def reducer(key, values):
+    print ""
     print "Start reducer"
     print "============="
     # key: key from mapper used to aggregate
@@ -145,24 +147,57 @@ def reducer(key, values):
     weights = splitArrays[0].ravel()
     coreset = splitArrays[1]
 
-    centroids,_ = kmeans(coreset, k, iter=kMeansLoop)
+    # centroids,_ = kmeans(coreset, k, iter=kMeansLoop)
 
-    # n = coreset.shape[0]
-    # weights = weights / (1.0 * np.sum(weights))
-    # centroids_indices = np.random.choice(coreset.shape[0], k, p=weights, replace=False)
-    # centroids = np.array(coreset[centroids_indices])
+    n = coreset.shape[0]
+    d = coreset.shape[1]
+
+    # Update the weights
+    weights = weights / (1.0 * np.sum(weights))
+
+    # Initialize k centroids
+    #centroids_indices = np.random.choice(coreset.shape[0], k, p=weights, replace=False)
+    centroids_indices = np.random.choice(coreset.shape[0], k, replace=False)
+    centroids = np.array(coreset[centroids_indices])
+    old_centroids = np.zeros((k,d))
     
-    
-    # print "Calculating gradient descent..." 
-    # for l in range(0, kMeansLoop):
-    #     print "Round", l
-    #     for t in range(0, coreset.shape[0]):
-    #         c = nearest_B_index(coreset[t], centroids)
-    #         centroids[c] = centroids[c] + 10000.0 / (l*n+t+1) * weights[t] * (coreset[t] - centroids[c])
-    
+    round = 0
+
+    print "Calculating centroids..." 
+    while True:
+        print "Round", round
+        round += 1
+        old_centroids = np.copy(centroids)
+
+        # Initialize the centroid mapper
+        centroids_sum = np.zeros((k,d))
+        centroids_weight = np.zeros(k)
+
+        # For each point, do the assignment to the nearest centroid
+        for i, x in enumerate(coreset):
+            index_nearest_B = nearest_B_index(x, centroids)
+            centroids_sum[index_nearest_B] += x * weights[i]
+            centroids_weight[index_nearest_B] += weights[i]
+
+        # update the centroid center
+        for i in range(k):
+            if centroids_weight[i] > 1e-5:
+                centroids[i] = centroids_sum[i] / centroids_weight[i]
+            else:
+                print "centroid", i, "has 0 weight"
+
+        # Check convergence
+        if np.array_equal(old_centroids,centroids):
+            break
+
+        # Max round
+        if round > kMeansLoop:
+            break
+        
     print "Parameters"
     print "=========="
 
+    print "Method:", "Llyods Heuristic"
     print "k:",k
     print "d2SampleSize:",d2SampleSize
     print "coresetSize:",coresetSize
