@@ -8,6 +8,7 @@ k = 200
 d2SampleSize = 20
 coresetSize = 2000
 kMeansLoop = 20
+
 def nearest_B_index(x, B):
     '''
     Returns the index of the nearest point in B to point x
@@ -97,7 +98,7 @@ def importance_sampling(X, B, coresetSize):
     
     nearest_B_indices = []
     nearbiDataPointsDistanceSums = np.zeros(lenB, dtype=float)
-    nearbiDataPointsLength = np.zeros(lenB, dtype=float)
+    nearbiDataPointsLength = np.zeros(lenB, dtype=int)
     
     for i, x in enumerate(X):
         iNearestB = nearest_B_index(x, B)
@@ -115,6 +116,7 @@ def importance_sampling(X, B, coresetSize):
 
         sum_term = first_term + second_term + third_term
         sampling_probabilities.append(sum_term)
+
     
     sampling_probabilities = sampling_probabilities / (np.sum(sampling_probabilities) * 1.0)
     coreset_indices = np.random.choice(n,coresetSize,p=sampling_probabilities, replace=False)
