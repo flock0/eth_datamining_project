@@ -6,8 +6,9 @@ import time
 
 k = 200
 d2SampleSize = 20
-coresetSize = 400
-kMeansLoop = 20
+coresetSize = 900
+kMeansLoop = 16
+
 def nearest_B_index(x, B):
     '''
     Returns the index of the nearest point in B to point x
@@ -84,6 +85,15 @@ def d2sampling(X, samplesize):
     return B
 
 def importance_sampling(X, B, coresetSize):
+    '''
+    Samples points with high impact on the objective function,
+    which upper bound the sensitivity function, more frequently.
+
+    Arguments:
+    X - The data points as a matrix
+    B - The set of bicriteria points as a matrix
+    coresetSize - the number of sample which should be drawn
+    '''
     n = X.shape[0]
     lenB = B.shape[0]
     alpha = log(k, 2) + 1
@@ -92,19 +102,23 @@ def importance_sampling(X, B, coresetSize):
     distances = []
     for x in X:
         distances.append(squared_distance(x, B))
-        
+    
+    # Calculate the mean of square distances
     c_mean = np.sum(distances) / (n * 1.0)
     
+    # Initialize the arrays for the importance sampling calculation
     nearest_B_indices = []
     nearbiDataPointsDistanceSums = np.zeros(lenB, dtype=float)
     nearbiDataPointsLength = np.zeros(lenB, dtype=float)
     
+    # Prepare the arrays for the importance sampling calculation
     for i, x in enumerate(X):
         iNearestB = nearest_B_index(x, B)
         nearest_B_indices.append(iNearestB)
         nearbiDataPointsDistanceSums[iNearestB] += distances[i]
         nearbiDataPointsLength[iNearestB] += 1.0
 
+    # Calculate the importance sampling distribution
     sampling_probabilities = []
     for i, item in enumerate(X):
         first_term = alpha*distances[i]/c_mean
@@ -116,57 +130,65 @@ def importance_sampling(X, B, coresetSize):
         sum_term = first_term + second_term + third_term
         sampling_probabilities.append(sum_term)
     
+    # Normalize the sampling distribution
     sampling_probabilities = sampling_probabilities / (np.sum(sampling_probabilities) * 1.0)
+    
+    # Draw the coreset in respect to the sampling distribution
     coreset_indices = np.random.choice(n,coresetSize,p=sampling_probabilities, replace=False)
     coreset = np.array(X[coreset_indices])
+    
+    # Calculate the weight
     weights = 1.0 / np.array(sampling_probabilities[coreset_indices])
     return coreset, weights
 
 def mapper(key, value):
-    print ""
-    print "Start mapper"
-    print "============"
-    # key: None
-    # value: one line of input file
-    print "Calculating d2sampling..."
+    '''
+    sample points with high impact on the objective function,
+    which upper bound the sensitivity function, more frequently.
+
+    Arguments:
+    key - None
+    value - the data set
+    '''
+    # Sample with d2 sampling to get the bicriteria set B
     B = d2sampling(value, d2SampleSize)
-    print "Calculating importancesampling..."
+    # Sample the coresetk with importance sampling
     coreset, weights = importance_sampling(value, B, coresetSize)
-    print "finished"
+    # return the coreset with it's weights
     yield "key", np.concatenate([weights.reshape((coresetSize, 1)), coreset], axis=1)
 
-
 def reducer(key, values):
-    print ""
-    print "Start reducer"
-    print "============="
-    # key: key from mapper used to aggregate
-    # values: list of all value for that key
-    # Note that we do *not* output a (key, value) pair here.
+    '''
+    Caculates the centroids from the coresets by using kmeans with
+    Llyod's heuristic. The points are initialized weighted by the
+    inverse of their weights.
+
+    Arguments:
+    key - fixed as "key"
+    value - the coreset with it0s weights continated
+    '''
+    # Split the weights and the coreset
     splitArrays = np.split(values, [1],axis=1)
     weights = splitArrays[0].ravel()
     coreset = splitArrays[1]
 
-    # centroids,_ = kmeans(coreset, k, iter=kMeansLoop)
-
+    # Get the parameters
     n = coreset.shape[0]
     d = coreset.shape[1]
 
     # Update the weights
+    prob = 1.0 / weights
+    prob = prob / (np.sum(prob) * 1.0)
     weights = weights / (1.0 * np.sum(weights))
 
     # Initialize k centroids
-    #centroids_indices = np.random.choice(coreset.shape[0], k, p=weights, replace=False)
-    centroids_indices = np.random.choice(coreset.shape[0], k, replace=False)
+    centroids_indices = np.random.choice(coreset.shape[0], k, p=prob, replace=False)
     centroids = np.array(coreset[centroids_indices])
     old_centroids = np.zeros((k,d))
     
+    # Kmeans algorithm with Lloyd's heuristic
     round = 0
-
-    print "Calculating centroids..." 
     while True:
-        print "Round", round
-        round += 1
         old_centroids = np.copy(centroids)
 
         # Initialize the centroid mapper
@@ -181,7 +203,7 @@ def reducer(key, values):
 
         # update the centroid center
         for i in range(k):
-            if centroids_weight[i] > 1e-5:
+            if centroids_weight[i] > 1e-7:
                 centroids[i] = centroids_sum[i] / centroids_weight[i]
             else:
                 print "centroid", i, "has 0 weight"
@@ -190,19 +212,8 @@ def reducer(key, values):
         if np.array_equal(old_centroids,centroids):
             break
 
-        # Max round
+        # Check Max round
         if round > kMeansLoop:
             break
-        
-    print "Parameters"
-    print "=========="
-
-    print "Method:", "Llyods Heuristic"
-    print "k:",k
-    print "d2SampleSize:",d2SampleSize
-    print "coresetSize:",coresetSize
-    print "kMeansLoop:",kMeansLoop
-
+            
     yield centroids
-
-#Oben 1000, unten 5000 coresetsize
