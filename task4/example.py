@@ -6,12 +6,12 @@ B = {}
 b = {}
 A = {}
 
-d=36
-k=6
+d = 6 # article features
+k = 36 # user features * article features
 alpha=10
 
 best_article = -1
-best_x_t_a = -1
+best_x = -1
 best_z_t_a = -1
 
 def set_articles(articles):
@@ -54,7 +54,7 @@ def update(reward):
     global X
     global best_article
     global best_score
-    global best_x_t_a
+    global best_x
     global best_z_t_a
 
     # Update the weights
@@ -62,15 +62,15 @@ def update(reward):
     B_a_T = np.transpose(B_a)
     A_a = A[best_article]
     A_a_inv = np.linalg.inv(A_a)
-    x_t_a = best_x_t_a
+    x = best_x
     z_t_a = best_z_t_a
     
     A[0] += B_a_T.dot(A_a_inv).dot(B_a)
     b[0] += B_a_T.dot(A_a_inv).dot(b[best_article])
-    A[best_article] += np.outer(x_t_a.ravel(),x_t_a.ravel())
-    B[best_article] += np.outer(x_t_a.ravel(),z_t_a.ravel())
+    A[best_article] += np.outer(x.ravel(),x.ravel())
+    B[best_article] += np.outer(x.ravel(),z_t_a.ravel())
 
-    b[best_article] += reward *x_t_a
+    b[best_article] += reward *x
     A[0] += np.outer(z_t_a.ravel(),z_t_a.ravel()) - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(B[best_article])
     b[0] += reward*z_t_a - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(b[best_article])
 
@@ -91,11 +91,10 @@ def recommend(time, user_features, choices):
     global X
     global best_article
     global best_score
-    global best_x_t_a
+    global best_x
     global best_z_t_a
 
-    z = np.array(user_features).reshape([k,1])
-    z_T = np.transpose(z)
+    
 
     # Calculate beta_hat
     A_0_inv = np.linalg.inv(A[0])
@@ -110,9 +109,12 @@ def recommend(time, user_features, choices):
             B[article] = np.zeros([d,k])
             b[article] = np.zeros([d,1])
             
-        # Calculate x_t_a
-        x = np.array(X[article]).reshape((k,1))
-        x_t_a = np.outer(x.ravel(),z.ravel()).reshape(36,1)
+        # Calculate x
+        x = np.array(X[article]).reshape((d,1))
+        x_T = np.transpose(x)
+
+        z = np.outer(x.ravel(),np.array(user_features).ravel()).reshape(k,1)
+        z_T = np.transpose(z)
 
         B_a = B[article]
         B_a_T = np.transpose(B[article])
@@ -137,29 +139,29 @@ def recommend(time, user_features, choices):
         # print "A_0_inv:", A_0_inv.shape 
         # print "B_a_T:", B_a_T.shape
         # print "A_a_inv:", A_a_inv.shape
-        # print "x_t_a:", x_t_a.shape 
-        second_term = 2 * z_T.dot(A_0_inv).dot(B_a_T).dot(A_a_inv).dot(x_t_a)[0]
+        # print "x:", x.shape 
+        second_term = 2 * z_T.dot(A_0_inv).dot(B_a_T).dot(A_a_inv).dot(x)[0]
         # print "second_term:", second_term 
 
-        third_term = np.transpose(x_t_a).dot(A_a_inv).dot(x_t_a)
+        third_term = x_T.dot(A_a_inv).dot(x)
         # print "third_term:", third_term
         
-        forth_term = np.transpose(x_t_a).dot(A_a_inv).dot(B_a).dot(A_0_inv).dot(B_a_T).dot(A_a_inv).dot(x_t_a)
+        forth_term = x_T.dot(A_a_inv).dot(B_a).dot(A_0_inv).dot(B_a_T).dot(A_a_inv).dot(x)
         # print "forth_term:", forth_term
 
         s_t_a = first_term - second_term + third_term + forth_term
 
         # print "z_T:", z_T.shape
         # print "beta_hat:", beta_hat.shape
-        # print "x_t_a:", x_t_a.shape
+        # print "x:", x.shape
         # print "phi_a_hat:", phi_a_hat.shape
-        p_t_a = z_T.dot(beta_hat)[0][0] + np.transpose(x_t_a).dot(phi_a_hat)[0][0] + alpha * np.sqrt(s_t_a * 1.0)
+        p_t_a = z_T.dot(beta_hat)[0][0] + x_T.dot(phi_a_hat)[0][0] + alpha * np.sqrt(s_t_a * 1.0)
         # print "p_t_a:", p_t_a
 
         if p_t_a > best_score:
             best_article = article
             best_score = p_t_a
-            best_x_t_a = x_t_a
+            best_x = x
             best_z_t_a = z
 
 
