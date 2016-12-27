@@ -43,9 +43,8 @@ def update(reward):
     print "======"
 
     # Check if the reward is positive
-    if reward == 0:
-        print "negative reward"
-        return
+    if reward == -1:
+        pass
 
 
     # Set all the variables to global
