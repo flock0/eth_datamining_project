@@ -12,7 +12,7 @@ alpha=10
 
 best_article = -1
 best_x = -1
-best_z_t_a = -1
+best_z = -1
 
 def set_articles(articles):
     '''
@@ -55,7 +55,7 @@ def update(reward):
     global best_article
     global best_score
     global best_x
-    global best_z_t_a
+    global best_z
 
     # Update the weights
     B_a = B[best_article]
@@ -63,16 +63,16 @@ def update(reward):
     A_a = A[best_article]
     A_a_inv = np.linalg.inv(A_a)
     x = best_x
-    z_t_a = best_z_t_a
+    z = best_z
     
     A[0] += B_a_T.dot(A_a_inv).dot(B_a)
     b[0] += B_a_T.dot(A_a_inv).dot(b[best_article])
     A[best_article] += np.outer(x.ravel(),x.ravel())
-    B[best_article] += np.outer(x.ravel(),z_t_a.ravel())
+    B[best_article] += np.outer(x.ravel(),z.ravel())
 
     b[best_article] += reward *x
-    A[0] += np.outer(z_t_a.ravel(),z_t_a.ravel()) - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(B[best_article])
-    b[0] += reward*z_t_a - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(b[best_article])
+    A[0] += np.outer(z.ravel(),z.ravel()) - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(B[best_article])
+    b[0] += reward*z - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(b[best_article])
 
 step = 0
 
@@ -92,7 +92,7 @@ def recommend(time, user_features, choices):
     global best_article
     global best_score
     global best_x
-    global best_z_t_a
+    global best_z
 
     
 
@@ -162,7 +162,7 @@ def recommend(time, user_features, choices):
             best_article = article
             best_score = p_t_a
             best_x = x
-            best_z_t_a = z
+            best_z = z
 
 
     return best_article
