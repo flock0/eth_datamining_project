@@ -63,14 +63,18 @@ def update(reward):
     z = best_z
     z_T = np.transpose(z)
     
-    A[0] += B_a_T.dot(A_a_inv).dot(B_a)
-    b[0] += B_a_T.dot(A_a_inv).dot(b[best_article])
+    BT_Ainv_product = B_a_T.dot(A_a_inv) # Dot product used for the next two sums
+    A[0] += BT_Ainv_product.dot(B_a)
+    b[0] += BT_Ainv_product.dot(b[best_article])
+
     A[best_article] += np.outer(x.ravel(),x_T.ravel())
     B[best_article] += np.outer(x.ravel(),z_T.ravel())
 
     b[best_article] += reward * x
-    A[0] += np.outer(z.ravel(),z_T.ravel()) - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(B[best_article])
-    b[0] += reward * z - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(b[best_article])
+    
+    BT_Ainv_B_product = np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])) # Dot product used for the next two subtractions
+    A[0] += np.outer(z.ravel(),z_T.ravel()) - BT_Ainv_B_product.dot(B[best_article])
+    b[0] += reward * z - BT_Ainv_B_product.dot(b[best_article])
 
 step = 0
 
