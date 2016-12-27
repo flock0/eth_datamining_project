@@ -28,10 +28,17 @@ def set_articles(articles):
     X = articles
 
     # Initialize A_0 and b_0
+    global A_0
+    global A_0_inv
+    global beta_hat
     global A
     global b
-    A[0] = np.identity(k)
+
+    # Initialize A_0_inv an beta_hat here as well, as it does not get modified in the recommend function at all
+    A_0 = np.identity(k)
+    A_0_inv = np.identity(k)
     b[0] = np.zeros([k,1])
+    beta_hat = A_0_inv.dot(b[0])
 
 def update(reward):
     '''
@@ -44,6 +51,9 @@ def update(reward):
 
 
     # Set all the variables to global
+    global A_0
+    global A_0_inv
+    global beta_hat
     global A
     global B
     global b
@@ -62,7 +72,7 @@ def update(reward):
     z = best_z
     
     BT_Ainv_product = B_a_T.dot(A_a_inv) # Dot product used for the next two sums
-    A[0] += BT_Ainv_product.dot(B_a)
+    A_0 += BT_Ainv_product.dot(B_a)
     b[0] += BT_Ainv_product.dot(b[best_article])
 
     A[best_article] += np.outer(x.ravel(),x.ravel())
@@ -71,8 +81,12 @@ def update(reward):
     b[best_article] += reward * x
 
     BT_Ainv_B_product = np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])) # Dot product used for the next two subtractions
-    A[0] += np.outer(z.ravel(),z.ravel()) - BT_Ainv_B_product.dot(B[best_article])
+    A_0 += np.outer(z.ravel(),z.ravel()) - BT_Ainv_B_product.dot(B[best_article])
     b[0] += reward * z - BT_Ainv_B_product.dot(b[best_article])
+
+    # Update A_0_inv an beta_hat here, as it does not get modified in the recommend function at all
+    A_0_inv = np.linalg.inv(A_0)
+    beta_hat = A_0_inv.dot(b[0])
 
 step = 0
 
@@ -87,12 +101,6 @@ def recommend(time, user_features, choices):
     global best_score
     global best_x
     global best_z
-
-    
-
-    # Calculate beta_hat
-    A_0_inv = np.linalg.inv(A[0])
-    beta_hat = A_0_inv.dot(b[0])
     
     # Estimate the score per article
     best_article = -1
