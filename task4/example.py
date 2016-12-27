@@ -8,7 +8,8 @@ A = {}
 
 d = 6 # article features
 k = 36 # user features * article features
-alpha=10
+delta = 0.05
+alpha = 1 + math.sqrt(math.log(2.0 / delta) / 2)
 
 best_article = -1
 best_x = -1
