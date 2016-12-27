@@ -63,16 +63,18 @@ def update(reward):
     A_a = A[best_article]
     A_a_inv = np.linalg.inv(A_a)
     x = best_x
+    x_T = np.transpose(x)
     z = best_z
+    z_T = np.transpose(z)
     
     A[0] += B_a_T.dot(A_a_inv).dot(B_a)
     b[0] += B_a_T.dot(A_a_inv).dot(b[best_article])
-    A[best_article] += np.outer(x.ravel(),x.ravel())
-    B[best_article] += np.outer(x.ravel(),z.ravel())
+    A[best_article] += np.outer(x.ravel(),x_T.ravel())
+    B[best_article] += np.outer(x.ravel(),z_T.ravel())
 
-    b[best_article] += reward *x
-    A[0] += np.outer(z.ravel(),z.ravel()) - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(B[best_article])
-    b[0] += reward*z - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(b[best_article])
+    b[best_article] += reward * x
+    A[0] += np.outer(z.ravel(),z_T.ravel()) - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(B[best_article])
+    b[0] += reward * z - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(b[best_article])
 
 step = 0
 
