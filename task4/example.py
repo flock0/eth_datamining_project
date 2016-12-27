@@ -8,7 +8,7 @@ A = {}
 
 d=36
 k=6
-alpha=1
+alpha=10
 
 best_article = -1
 best_x_t_a = -1
@@ -43,8 +43,10 @@ def update(reward):
     print "======"
 
     # Check if the reward is positive
-    if reward == -1:
+    if reward == 0:
+        print "negative reward"
         return
+
 
     # Set all the variables to global
     global A
@@ -61,7 +63,7 @@ def update(reward):
     B_a_T = np.transpose(B_a)
     A_a = A[best_article]
     A_a_inv = np.linalg.inv(A_a)
-    x_t_a = best_x_t_a.reshape(36,1)
+    x_t_a = best_x_t_a
     z_t_a = best_z_t_a
     
     A[0] += B_a_T.dot(A_a_inv).dot(B_a)
@@ -70,7 +72,7 @@ def update(reward):
     B[best_article] += np.outer(x_t_a.ravel(),z_t_a.ravel())
 
     b[best_article] += reward *x_t_a
-    A[0] += np.outer(z_t_a,z_t_a) - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(B[best_article])
+    A[0] += np.outer(z_t_a.ravel(),z_t_a.ravel()) - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(B[best_article])
     b[0] += reward*z_t_a - np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])).dot(b[best_article])
 
 step = 0
@@ -111,7 +113,7 @@ def recommend(time, user_features, choices):
             
         # Calculate x_t_a
         x = np.array(X[article]).reshape((k,1))
-        x_t_a = (x * np.transpose(z)).ravel()
+        x_t_a = np.outer(x.ravel(),z.ravel()).reshape(36,1)
 
         B_a = B[article]
         B_a_T = np.transpose(B[article])
@@ -146,13 +148,13 @@ def recommend(time, user_features, choices):
         forth_term = np.transpose(x_t_a).dot(A_a_inv).dot(B_a).dot(A_0_inv).dot(B_a_T).dot(A_a_inv).dot(x_t_a)
         # print "forth_term:", forth_term
 
-        s_t_a = first_term - second_term + forth_term + third_term
+        s_t_a = first_term - second_term + third_term + forth_term
 
         # print "z_T:", z_T.shape
         # print "beta_hat:", beta_hat.shape
         # print "x_t_a:", x_t_a.shape
         # print "phi_a_hat:", phi_a_hat.shape
-        p_t_a = z_T.dot(beta_hat)[0][0] + np.transpose(x_t_a).dot(phi_a_hat)[0] + alpha * np.sqrt(s_t_a * 1.0)
+        p_t_a = z_T.dot(beta_hat)[0][0] + np.transpose(x_t_a).dot(phi_a_hat)[0][0] + alpha * np.sqrt(s_t_a * 1.0)
         # print "p_t_a:", p_t_a
 
         if p_t_a > best_score:
@@ -160,6 +162,7 @@ def recommend(time, user_features, choices):
             best_score = p_t_a
             best_x_t_a = x_t_a
             best_z_t_a = z
+
 
     return best_article
 
