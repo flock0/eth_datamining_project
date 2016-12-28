@@ -139,7 +139,8 @@ def recommend(time, user_features, choices):
         # print "z_T:", z_T.shape
         # print "A_0_inv:", A_0_inv.shape
         # print "z:", z.shape
-        first_term = z_T.dot(A_0_inv).dot(z)[0][0]
+        zT_A0inv_prodcuct = z_T.dot(A_0_inv)  # Dot product used for the next two terms
+        first_term = zT_A0inv_prodcuct.dot(z)[0][0]
         # print "first_term:", first_term
 
         # print "z_T", z_T.shape
@@ -147,13 +148,14 @@ def recommend(time, user_features, choices):
         # print "B_a_T:", B_a_T.shape
         # print "A_a_inv:", A_a_inv.shape
         # print "x:", x.shape 
-        second_term = 2 * z_T.dot(A_0_inv).dot(B_a_T).dot(A_a_inv).dot(x)[0]
+        second_term = (2 * zT_A0inv_prodcuct).dot(B_a_T).dot(A_a_inv).dot(x)[0]
         # print "second_term:", second_term 
 
-        third_term = x_T.dot(A_a_inv).dot(x)
+        xT_Aainv_product = x_T.dot(A_a_inv) # Dot product used for the next two terms
+        third_term = xT_Aainv_product.dot(x)
         # print "third_term:", third_term
         
-        forth_term = x_T.dot(A_a_inv).dot(B_a).dot(A_0_inv).dot(B_a_T).dot(A_a_inv).dot(x)
+        forth_term = xT_Aainv_product.dot(B_a).dot(A_0_inv).dot(B_a_T).dot(A_a_inv).dot(x)
         # print "forth_term:", forth_term
 
         s_t_a = first_term - second_term + third_term + forth_term
