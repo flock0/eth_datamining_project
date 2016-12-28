@@ -8,7 +8,6 @@ B = {}
 b = {}
 A = {}
 A_inv = {}
-phi = {}
 
 d = 6 # article features
 k = 36 # user features * article features
@@ -60,7 +59,6 @@ def update(reward):
     global A_inv
     global B
     global b
-    global phi
     global X
     global best_article
     global best_score
@@ -92,7 +90,6 @@ def update(reward):
     # Update A_0_inv an beta_hat here, as it does not get modified in the recommend function at all
     A_0_inv = np.linalg.inv(A_0)
     beta_hat = A_0_inv.dot(b[0])
-    phi[best_article] = A_inv[best_article].dot(b[best_article] - B[best_article].dot(beta_hat))
 
 step = 0
 
@@ -118,7 +115,7 @@ def recommend(time, user_features, choices):
             A_inv[article] = np.identity(d)
             B[article] = np.zeros([d,k])
             b[article] = np.zeros([d,1])
-            phi[article] = A_inv[article].dot(b[article] - B[article].dot(beta_hat))
+            
         # Calculate x
         x = np.array(X[article]).reshape((d,1))
         x_T = np.transpose(x)
@@ -136,7 +133,8 @@ def recommend(time, user_features, choices):
         # print "B[article]:", B[article].shape
         # print "beta_hat:", beta_hat.shape
 
-        phi_a_hat = phi[article]
+        phi_a_hat = A_a_inv.dot(b[article] - B[article].dot(beta_hat))
+
         # Calculate the variance s_t_a
         # print "z_T:", z_T.shape
         # print "A_0_inv:", A_0_inv.shape
