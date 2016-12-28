@@ -17,7 +17,7 @@ alpha = 1 + math.sqrt(math.log(2.0 / delta) / 2)
 best_article = -1
 best_x = -1
 best_z = -1
-
+@profile
 def set_articles(articles):
     '''
     Save the articles globally as a hashmap and initialize for hybrid LinUCB
@@ -40,7 +40,7 @@ def set_articles(articles):
     A_0_inv = np.identity(k)
     b[0] = np.zeros([k,1])
     beta_hat = A_0_inv.dot(b[0])
-
+@profile
 def update(reward):
     '''
     Update the weights
@@ -92,7 +92,7 @@ def update(reward):
     beta_hat = A_0_inv.dot(b[0])
 
 step = 0
-
+@profile
 def recommend(time, user_features, choices):
 
     # Set all the variables to global
