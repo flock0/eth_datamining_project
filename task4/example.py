@@ -7,6 +7,7 @@ X = {}
 B = {}
 b = {}
 A = {}
+A_inv = {}
 
 d = 6 # article features
 k = 36 # user features * article features
@@ -55,6 +56,7 @@ def update(reward):
     global A_0_inv
     global beta_hat
     global A
+    global A_inv
     global B
     global b
     global X
@@ -67,7 +69,7 @@ def update(reward):
     B_a = B[best_article]
     B_a_T = np.transpose(B_a)
     A_a = A[best_article]
-    A_a_inv = np.linalg.inv(A_a)
+    A_a_inv = A_inv[best_article]
     x = best_x
     z = best_z
     
@@ -76,11 +78,12 @@ def update(reward):
     b[0] += BT_Ainv_product.dot(b[best_article])
 
     A[best_article] += np.outer(x.ravel(),x.ravel())
+    A_inv[best_article] = np.linalg.inv(A[best_article]) # We cache A_inv so we don't have to recalculate it for every recommend step
     B[best_article] += np.outer(x.ravel(),z.ravel())
 
     b[best_article] += reward * x
 
-    BT_Ainv_B_product = np.transpose(B[best_article]).dot(np.linalg.inv(A[best_article])) # Dot product used for the next two subtractions
+    BT_Ainv_B_product = np.transpose(B[best_article]).dot(A_inv[best_article]) # Dot product used for the next two subtractions
     A_0 += np.outer(z.ravel(),z.ravel()) - BT_Ainv_B_product.dot(B[best_article])
     b[0] += reward * z - BT_Ainv_B_product.dot(b[best_article])
 
@@ -94,6 +97,7 @@ def recommend(time, user_features, choices):
 
     # Set all the variables to global
     global A
+    global A_inv
     global B
     global b
     global X
@@ -108,6 +112,7 @@ def recommend(time, user_features, choices):
     for article in choices:
         if not article in A:
             A[article] = np.identity(d)
+            A_inv[article] = np.identity(d)
             B[article] = np.zeros([d,k])
             b[article] = np.zeros([d,1])
             
@@ -122,7 +127,7 @@ def recommend(time, user_features, choices):
         B_a_T = np.transpose(B[article])
 
         # Estimate our phi_a_hat
-        A_a_inv = np.linalg.inv(A[article])
+        A_a_inv = A_inv[article]
         # print "A_a_inv:", A_a_inv.shape
         # print "b[article]:", b[article].shape
         # print "B[article]:", B[article].shape
