@@ -83,9 +83,9 @@ def update(reward):
 
     b[best_article] += reward * x
 
-    BT_Ainv_B_product = np.transpose(B[best_article]).dot(A_inv[best_article]) # Dot product used for the next two subtractions
-    A_0 += np.outer(z.ravel(),z.ravel()) - BT_Ainv_B_product.dot(B[best_article])
-    b[0] += reward * z - BT_Ainv_B_product.dot(b[best_article])
+    BT_Ainv_product = np.transpose(B[best_article]).dot(A_inv[best_article]) # Dot product used for the next two subtractions
+    A_0 += np.outer(z.ravel(),z.ravel()) - BT_Ainv_product.dot(B[best_article])
+    b[0] += reward * z - BT_Ainv_product.dot(b[best_article])
 
     # Update A_0_inv an beta_hat here, as it does not get modified in the recommend function at all
     A_0_inv = np.linalg.inv(A_0)
