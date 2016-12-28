@@ -17,6 +17,11 @@ alpha = 1 + math.sqrt(math.log(2.0 / delta) / 2)
 best_article = -1
 best_x = -1
 best_z = -1
+
+@profile
+def inverse(A)
+    return np.linalg.inv(A)
+
 @profile
 def set_articles(articles):
     '''
@@ -78,7 +83,7 @@ def update(reward):
     b[0] += BT_Ainv_product.dot(b[best_article])
 
     A[best_article] += np.outer(x.ravel(),x.ravel())
-    A_inv[best_article] = np.linalg.inv(A[best_article]) # We cache A_inv so we don't have to recalculate it for every recommend step
+    A_inv[best_article] = inverse(A[best_article]) # We cache A_inv so we don't have to recalculate it for every recommend step
     B[best_article] += np.outer(x.ravel(),z.ravel())
 
     b[best_article] += reward * x
@@ -88,7 +93,7 @@ def update(reward):
     b[0] += reward * z - BT_Ainv_product.dot(b[best_article])
 
     # Update A_0_inv an beta_hat here, as it does not get modified in the recommend function at all
-    A_0_inv = np.linalg.inv(A_0)
+    A_0_inv = inverse(A_0)
     beta_hat = A_0_inv.dot(b[0])
 
 step = 0
