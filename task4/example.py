@@ -95,7 +95,7 @@ def update(reward):
     A_a = A[best_article]
     A_a_inv = A_inv[best_article]
     x_T = best_x
-    z = best_z
+    z_T = best_z
     
     BT_Ainv_product = B_a_T.dot(A_a_inv) # Dot product used for the next two sums
     A_0 += BT_Ainv_product.dot(B_a)
@@ -103,13 +103,13 @@ def update(reward):
 
     A[best_article] += np.outer(x_T, x_T)
     A_inv[best_article] = inverse(A[best_article]) # We cache A_inv so we don't have to recalculate it for every recommend step
-    B[best_article] += np.outer(x_T, z.ravel())
+    B[best_article] += np.outer(x_T, z_T)
 
     b[best_article] += reward * x_T.reshape((d,1))
 
     BT_Ainv_product = np.transpose(B[best_article]).dot(A_inv[best_article]) # Dot product used for the next two subtractions
-    A_0 += np.outer(z.ravel(),z.ravel()) - BT_Ainv_product.dot(B[best_article])
-    b[0] += reward * z - BT_Ainv_product.dot(b[best_article])
+    A_0 += np.outer(z_T, z_T) - BT_Ainv_product.dot(B[best_article])
+    b[0] += reward * z_T.reshape((k,1)) - BT_Ainv_product.dot(b[best_article])
 
     # Update A_0_inv an beta_hat here, as it does not get modified in the recommend function at all
     A_0_inv = inverse(A_0)
@@ -130,6 +130,7 @@ def recommend(time, user_features, choices):
     global best_x
     global best_z
     
+    user_features_array = np.array(user_features)
     # Estimate the score per article
     best_article = -1
     best_score = -1
@@ -143,8 +144,7 @@ def recommend(time, user_features, choices):
         # Get the row vector of the current article
         x_T = X[article]
 
-        z = np.outer(x_T,np.array(user_features).ravel()).reshape(k,1)
-        z_T = np.ravel(z)
+        z_T = np.outer(x_T,user_features_array).ravel()
         
         B_a = B[article]
         B_a_T = np.transpose(B[article])
@@ -163,7 +163,7 @@ def recommend(time, user_features, choices):
         # print "A_0_inv:", A_0_inv.shape
         # print "z:", z.shape
         zT_A0inv_prodcuct = z_T.dot(A_0_inv)  # Dot product used for the next two terms
-        first_term = zT_A0inv_prodcuct.dot(z)[0]
+        first_term = np.inner(zT_A0inv_prodcuct, z_T)
         # print "first_term:", first_term
 
         # print "z_T", z_T.shape
@@ -195,7 +195,7 @@ def recommend(time, user_features, choices):
             best_article = article
             best_score = p_t_a
             best_x = x_T.reshape((d,1))
-            best_z = z
+            best_z = z_T
 
 
     return best_article
