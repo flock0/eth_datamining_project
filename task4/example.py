@@ -8,6 +8,7 @@ X = {}
 B = {}
 B_T = {}
 b = {}
+phi_hat = {}
 A = {}
 A_inv = {}
 
@@ -68,9 +69,6 @@ def update(reward):
     '''
     Update the weights
     '''
-    # print ""
-    # print "update"
-    # print "======"
 
     # Check if the reward is positive
     if reward == -1:
@@ -85,6 +83,7 @@ def update(reward):
     global B
     global B_T
     global b
+    global phi_hat
     global X
     global best_article
     global best_score
@@ -117,6 +116,8 @@ def update(reward):
     # Update A_0_inv an beta_hat here, as it does not get modified in the recommend function at all
     A_0_inv = inverse(A_0)
     beta_hat = A_0_inv.dot(b[0])
+    for article in A:
+        phi_hat[article] = A_inv[article].dot(b[article] - B[article].dot(beta_hat))
 
 step = 0
 @profile
@@ -128,6 +129,7 @@ def recommend(time, user_features, choices):
     global B
     global B_T
     global b
+    global phi_hat
     global X
     global best_article
     global best_score
@@ -145,7 +147,7 @@ def recommend(time, user_features, choices):
             B[article] = np.zeros([d,k])
             B_T[article] = np.zeros([k,d])
             b[article] = np.zeros([d,1])
-            
+            phi_hat[article] = A_inv[article].dot(b[article] - B[article].dot(beta_hat))
         # Get the row vector of the current article
         x_T = X[article]
 
@@ -161,7 +163,7 @@ def recommend(time, user_features, choices):
         # print "B[article]:", B[article].shape
         # print "beta_hat:", beta_hat.shape
 
-        phi_a_hat = A_a_inv.dot(b[article] - B[article].dot(beta_hat))
+        phi_a_hat = phi_hat[article]
 
         # Calculate the variance s_t_a
         # print "z_T:", z_T.shape
