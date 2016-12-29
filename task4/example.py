@@ -194,7 +194,7 @@ def recommend(time, user_features, choices):
         if p_t_a > best_score:
             best_article = article
             best_score = p_t_a
-            best_x = x_T.reshape((d,1))
+            best_x = x_T
             best_z = z_T
 
 
