@@ -157,8 +157,7 @@ def recommend(time, user_features, choices):
         # print "z_T:", z_T.shape
         # print "A_0_inv:", A_0_inv.shape
         # print "z:", z.shape
-        zT_A0inv_prodcuct = z_T.dot(A_0_inv)  # Dot product used for the next two terms
-        first_term = np.inner(zT_A0inv_prodcuct, z_T)
+        first_term = np.inner(z_T.dot(A_0_inv), z_T)
         # print "first_term:", first_term
 
         # print "z_T", z_T.shape
@@ -166,14 +165,15 @@ def recommend(time, user_features, choices):
         # print "B_a_T:", B_a_T.shape
         # print "A_a_inv:", A_a_inv.shape
         # print "x:", x.shape 
-        second_term = np.inner((2 * zT_A0inv_prodcuct).dot(B_a_T).dot(A_a_inv), x_T)
+        Aainv_x_product = np.inner(A_a_inv, x_T) #blau
+        A0inv_BT_Aainv_x_product = np.inner(A_0_inv, np.inner(B_a_T, Aainv_x_product)) #grean
+        second_term = 2 * np.inner(z_T, A0inv_BT_Aainv_x_product)
         # print "second_term:", second_term 
 
-        xT_Aainv_product = np.inner(x_T, A_a_inv) # Inner product used for the next two terms
-        third_term = np.inner(xT_Aainv_product, x_T)
+        third_term = np.inner(x_T, Aainv_x_product)
         # print "third_term:", third_term
         
-        forth_term = np.inner(xT_Aainv_product.dot(B_a).dot(A_0_inv).dot(B_a_T).dot(A_a_inv), x_T)
+        forth_term = np.inner(x_T, np.inner(A_a_inv, np.inner(B_a, A0inv_BT_Aainv_x_product)))
         # print "forth_term:", forth_term
 
         s_t_a = first_term - second_term + third_term + forth_term
