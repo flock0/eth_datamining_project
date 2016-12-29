@@ -8,7 +8,8 @@ A = {}
 
 d=36
 k=6
-alpha=10
+alpha=20
+print "alpha:", alpha
 
 best_article = -1
 best_x_t_a = -1
@@ -21,9 +22,9 @@ def set_articles(articles):
     Arguments:
     articles - a hashmap of all articles
     '''
-    print ""
-    print "set articles"
-    print "============"
+    # print ""
+    # print "set articles"
+    # print "============"
 
     global X
     X = articles
@@ -38,13 +39,12 @@ def update(reward):
     '''
     Update the weights
     '''
-    print ""
-    print "update"
-    print "======"
+    # print ""
+    # print "update"
+    # print "======"
 
     # Check if the reward is positive
-    if reward == 0:
-        print "negative reward"
+    if reward == -1:
         return
 
 
@@ -78,12 +78,12 @@ def update(reward):
 step = 0
 
 def recommend(time, user_features, choices):
-    print ""
-    print "recommend"
-    print "========="
-    global step
-    step += 1
-    print "Time:", step
+    # print ""
+    # print "recommend"
+    # print "========="
+    # global step
+    # step += 1
+    # print "Time:", step
 
     # Set all the variables to global
     global A
