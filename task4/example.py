@@ -1,8 +1,7 @@
 import math
 import numpy as np
 from time import sleep
-from numpy.linalg import lapack_lite
-lapack_routine = lapack_lite.dgesv
+
 
 X = {}
 B = {}
@@ -21,21 +20,9 @@ best_article = -1
 best_x = -1
 best_z = -1
 
-# https://stackoverflow.com/questions/11972102/is-there-a-way-to-efficiently-invert-an-array-of-matrices-with-numpy
-
-
 @profile
 def inverse(A):
-
-    n_eq = A.shape[0]
-    n_rhs = A.shape[1]
-    identity  = np.eye(n_eq)
-    b = np.copy(identity)
-    pivots = np.zeros(n_eq, np.intc)
-    results = lapack_lite.dgesv(n_eq, n_rhs, A, n_eq, pivots, b, n_eq, 0)
-    if results['info'] > 0:
-        raise LinAlgError('Singular matrix')
-    return b
+    return np.linalg.inv(A)
 
 @profile
 def set_articles(articles):
@@ -73,6 +60,7 @@ def update(reward):
     # Check if the reward is positive
     if reward == -1:
         return
+
 
     # Set all the variables to global
     global A_0
