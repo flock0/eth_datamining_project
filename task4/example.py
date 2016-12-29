@@ -62,7 +62,7 @@ def set_articles(articles):
     A_0 = np.identity(k)
     A_0_inv = np.identity(k)
     b[0] = np.zeros([k,1])
-    beta_hat = A_0_inv.dot(b[0])
+    beta_hat = A_0_inv.dot(b[0]).ravel()
 
 @profile
 def update(reward):
@@ -115,9 +115,9 @@ def update(reward):
 
     # Update A_0_inv an beta_hat here, as it does not get modified in the recommend function at all
     A_0_inv = inverse(A_0)
-    beta_hat = A_0_inv.dot(b[0])
+    beta_hat = A_0_inv.dot(b[0]).ravel()
     for article in A:
-        phi_hat[article] = A_inv[article].dot(b[article] - B[article].dot(beta_hat))
+        phi_hat[article] = A_inv[article].dot(b[article].ravel() - B[article].dot(beta_hat))
 
 step = 0
 @profile
@@ -147,7 +147,7 @@ def recommend(time, user_features, choices):
             B[article] = np.zeros([d,k])
             B_T[article] = np.zeros([k,d])
             b[article] = np.zeros([d,1])
-            phi_hat[article] = A_inv[article].dot(b[article] - B[article].dot(beta_hat))
+            phi_hat[article] = A_inv[article].dot(b[article].ravel() - B[article].dot(beta_hat))
         # Get the row vector of the current article
         x_T = X[article]
 
@@ -194,8 +194,9 @@ def recommend(time, user_features, choices):
         # print "beta_hat:", beta_hat.shape
         # print "x:", x.shape
         # print "phi_a_hat:", phi_a_hat.shape
-        
-        p_t_a = np.inner(z_T, beta_hat) + np.inner(x_T, phi_a_hat.ravel()) + alpha * np.sqrt(s_t_a * 1.0)
+        pta_first_term = np.inner(z_T, beta_hat)
+        pta_second_term = np.inner(x_T, phi_a_hat)
+        p_t_a = pta_first_term + pta_second_term + alpha * np.sqrt(s_t_a * 1.0)
         # print "p_t_a:", p_t_a
 
         if p_t_a > best_score:
