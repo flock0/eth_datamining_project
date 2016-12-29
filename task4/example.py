@@ -11,6 +11,7 @@ phi_hat = {}
 A = {}
 A_inv = {}
 Ainv_x_products = {}
+A0inv_BT_Ainv_x_products = {}
 
 d = 6 # article features
 k = 36 # user features * article features
@@ -70,6 +71,7 @@ def update(reward):
     global A
     global A_inv
     global Ainv_x_products
+    global A0inv_BT_Ainv_x_products
     global B
     global B_T
     global b
@@ -108,6 +110,7 @@ def update(reward):
     A_0_inv = inverse(A_0)
     beta_hat = A_0_inv.dot(b[0]).ravel()
     for article in A:
+        A0inv_BT_Ainv_x_products[article] = np.inner(A_0_inv, np.inner(B_T[article], Ainv_x_products[article]))
         phi_hat[article] = A_inv[article].dot(b[article].ravel() - B[article].dot(beta_hat))
 
 step = 0
@@ -118,6 +121,7 @@ def recommend(time, user_features, choices):
     global A
     global A_inv
     global Ainv_x_products
+    global A0inv_BT_Ainv_x_products
     global B
     global B_T
     global b
@@ -140,6 +144,7 @@ def recommend(time, user_features, choices):
             Ainv_x_products[article] = np.inner(A_inv[article], x_T)
             B[article] = np.zeros([d,k])
             B_T[article] = np.zeros([k,d])
+            A0inv_BT_Ainv_x_products[article] = np.inner(A_0_inv, np.inner(B_T[article], Ainv_x_products[article]))
             b[article] = np.zeros([d,1])
             phi_hat[article] = A_inv[article].dot(b[article].ravel() - B[article].dot(beta_hat))
         # Get the row vector of the current article
@@ -172,7 +177,7 @@ def recommend(time, user_features, choices):
         # print "A_a_inv:", A_a_inv.shape
         # print "x:", x.shape 
         Ainv_x_product = Ainv_x_products[article] #blau
-        A0inv_BT_Ainv_x_product = np.inner(A_0_inv, np.inner(B_a_T, Ainv_x_product)) #grean
+        A0inv_BT_Ainv_x_product = A0inv_BT_Ainv_x_products[article] #grean
         second_term = 2 * np.inner(z_T, A0inv_BT_Ainv_x_product)
         # print "second_term:", second_term 
 
