@@ -196,7 +196,7 @@ def recommend(time, user_features, choices):
         # print "phi_a_hat:", phi_a_hat.shape
         pta_first_term = np.inner(z_T, beta_hat)
         pta_second_term = np.inner(x_T, phi_a_hat)
-        p_t_a = pta_first_term + pta_second_term + alpha * np.sqrt(s_t_a * 1.0)
+        p_t_a = pta_first_term + pta_second_term + alpha * math.sqrt(s_t_a)
         # print "p_t_a:", p_t_a
 
         if p_t_a > best_score:
