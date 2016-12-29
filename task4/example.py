@@ -6,6 +6,7 @@ lapack_routine = lapack_lite.dgesv
 
 X = {}
 B = {}
+B_T = {}
 b = {}
 A = {}
 A_inv = {}
@@ -82,6 +83,7 @@ def update(reward):
     global A
     global A_inv
     global B
+    global B_T
     global b
     global X
     global best_article
@@ -104,6 +106,7 @@ def update(reward):
     A[best_article] += np.outer(x_T, x_T)
     A_inv[best_article] = inverse(A[best_article]) # We cache A_inv so we don't have to recalculate it for every recommend step
     B[best_article] += np.outer(x_T, z_T)
+    B_T[best_article] = np.transpose(B[best_article])
 
     b[best_article] += reward * x_T.reshape((d,1))
 
@@ -123,6 +126,7 @@ def recommend(time, user_features, choices):
     global A
     global A_inv
     global B
+    global B_T
     global b
     global X
     global best_article
@@ -139,6 +143,7 @@ def recommend(time, user_features, choices):
             A[article] = np.identity(d)
             A_inv[article] = np.identity(d)
             B[article] = np.zeros([d,k])
+            B_T[article] = np.zeros([k,d])
             b[article] = np.zeros([d,1])
             
         # Get the row vector of the current article
@@ -147,7 +152,7 @@ def recommend(time, user_features, choices):
         z_T = np.outer(x_T,user_features_array).ravel()
         
         B_a = B[article]
-        B_a_T = np.transpose(B[article])
+        B_a_T = B_T[article]
 
         # Estimate our phi_a_hat
         A_a_inv = A_inv[article]
