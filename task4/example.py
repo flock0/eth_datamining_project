@@ -43,6 +43,7 @@ def set_articles(articles):
     Arguments:
     articles - a hashmap of all articles
     '''
+
     global X
     X = articles
 
@@ -64,6 +65,9 @@ def update(reward):
     '''
     Update the weights
     '''
+    # print ""
+    # print "update"
+    # print "======"
 
     # Check if the reward is positive
     if reward == -1:
