@@ -10,6 +10,7 @@ b = {}
 phi_hat = {}
 A = {}
 A_inv = {}
+Ainv_x_products = {}
 
 d = 6 # article features
 k = 36 # user features * article features
@@ -68,6 +69,7 @@ def update(reward):
     global beta_hat
     global A
     global A_inv
+    global Ainv_x_products
     global B
     global B_T
     global b
@@ -92,6 +94,7 @@ def update(reward):
 
     A[best_article] += np.outer(x_T, x_T)
     A_inv[best_article] = inverse(A[best_article]) # We cache A_inv so we don't have to recalculate it for every recommend step
+    Ainv_x_products[best_article] = np.inner(A_inv[best_article], x_T) # We cache this product so we don't have to recalculate it for every recommend step
     B[best_article] += np.outer(x_T, z_T)
     B_T[best_article] = np.transpose(B[best_article])
 
@@ -114,6 +117,7 @@ def recommend(time, user_features, choices):
     # Set all the variables to global
     global A
     global A_inv
+    global Ainv_x_products
     global B
     global B_T
     global b
@@ -129,15 +133,17 @@ def recommend(time, user_features, choices):
     best_article = -1
     best_score = -1
     for article in choices:
+        x_T = X[article]
         if not article in A:
             A[article] = np.identity(d)
             A_inv[article] = np.identity(d)
+            Ainv_x_products[article] = np.inner(A_inv[article], x_T)
             B[article] = np.zeros([d,k])
             B_T[article] = np.zeros([k,d])
             b[article] = np.zeros([d,1])
             phi_hat[article] = A_inv[article].dot(b[article].ravel() - B[article].dot(beta_hat))
         # Get the row vector of the current article
-        x_T = X[article]
+        
 
         z_T = np.outer(x_T,user_features_array).ravel()
         
@@ -165,15 +171,15 @@ def recommend(time, user_features, choices):
         # print "B_a_T:", B_a_T.shape
         # print "A_a_inv:", A_a_inv.shape
         # print "x:", x.shape 
-        Aainv_x_product = np.inner(A_a_inv, x_T) #blau
-        A0inv_BT_Aainv_x_product = np.inner(A_0_inv, np.inner(B_a_T, Aainv_x_product)) #grean
-        second_term = 2 * np.inner(z_T, A0inv_BT_Aainv_x_product)
+        Ainv_x_product = Ainv_x_products[article] #blau
+        A0inv_BT_Ainv_x_product = np.inner(A_0_inv, np.inner(B_a_T, Ainv_x_product)) #grean
+        second_term = 2 * np.inner(z_T, A0inv_BT_Ainv_x_product)
         # print "second_term:", second_term 
 
-        third_term = np.inner(x_T, Aainv_x_product)
+        third_term = np.inner(x_T, Ainv_x_product)
         # print "third_term:", third_term
         
-        forth_term = np.inner(x_T, np.inner(A_a_inv, np.inner(B_a, A0inv_BT_Aainv_x_product)))
+        forth_term = np.inner(x_T, np.inner(A_a_inv, np.inner(B_a, A0inv_BT_Ainv_x_product)))
         # print "forth_term:", forth_term
 
         s_t_a = first_term - second_term + third_term + forth_term
