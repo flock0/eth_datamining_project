@@ -1,0 +1,32 @@
+Sender: LSF System <lsfadmin@e1144>
+Subject: Job 34582910: <python runner.py data/webscope-logs.txt data/webscope-articles.txt implementation-10.py> in cluster <euler> Exited
+
+Job <python runner.py data/webscope-logs.txt data/webscope-articles.txt implementation-10.py> was submitted from host <euler04> by user <yuda> in cluster <euler>.
+Job was executed on host(s) <e1144>, in queue <normal.4h>, as user <yuda> in cluster <euler>.
+</cluster/home/yuda> was used as the home directory.
+</cluster/home/yuda/task4> was used as the working directory.
+Started at Wed Dec 28 21:21:40 2016
+Results reported on Wed Dec 28 21:21:43 2016
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python runner.py data/webscope-logs.txt data/webscope-articles.txt implementation-10.py
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :               0.45 sec.
+    Total Requested Memory : 1024.00 MB
+    Delta Memory :           -
+    (Delta: the difference between Total Requested Memory and Max Memory.)
+
+The output (if any) follows:
+
+Traceback (most recent call last):
+  File "runner.py", line 99, in <module>
+    with open(args.source_file, "r") as fin:
+IOError: [Errno 2] No such file or directory: 'implementation-10.py'

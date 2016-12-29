@@ -1,0 +1,34 @@
+Sender: LSF System <lsfadmin@e1306>
+Subject: Job 34584723: <python runner.py data/webscope-logs.txt data/webscope-articles.txt implementation0.46.py> in cluster <euler> Done
+
+Job <python runner.py data/webscope-logs.txt data/webscope-articles.txt implementation0.46.py> was submitted from host <euler06> by user <yuda> in cluster <euler>.
+Job was executed on host(s) <e1306>, in queue <normal.4h>, as user <yuda> in cluster <euler>.
+</cluster/home/yuda> was used as the home directory.
+</cluster/home/yuda/task4> was used as the working directory.
+Started at Wed Dec 28 22:55:38 2016
+Results reported on Wed Dec 28 22:56:14 2016
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python runner.py data/webscope-logs.txt data/webscope-articles.txt implementation0.46.py
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :               34.68 sec.
+    Max Memory :             3353 MB
+    Average Memory :         3353.00 MB
+    Total Requested Memory : 1024.00 MB
+    Delta Memory :           -2329.00 MB
+    (Delta: the difference between Total Requested Memory and Max Memory.)
+    Max Processes :          3
+    Max Threads :            4
+
+The output (if any) follows:
+
+INFO:__main__:CTR achieved by the policy: 0.02945
+alpha: 0.46
