@@ -150,7 +150,7 @@ def recommend(time, user_features, choices):
         # Get the row vector of the current article
         
 
-        z_T = np.outer(x_T,user_features_array).ravel()
+        z_T = np.einsum('i,j', x_T, user_features_array).ravel()
         
         B_a = B[article]
         B_a_T = B_T[article]
