@@ -1,1 +1,1 @@
-# eth_datamining_project
+# Project repository for the Data Mining course 2016 at ETH Zurich
